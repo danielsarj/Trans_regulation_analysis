@@ -20,8 +20,12 @@ for (i in 1:nrow(gene_df)){
                                          GENPOS<=working_gene$end+1e6) %>%
     slice_max(abs(BETA), with_ties=F)
     
-  gene_df$topeQTL[i] <- qtls$ID
-  gene_df$beta[i] <- qtls$BETA
+  if (nrow(qtls)>0){
+    gene_df$topeQTL[i] <- qtls$ID
+    gene_df$beta[i] <- qtls$BETA
+  } else {
+    print('No QTLs present')
+  }
   
   print(working_gene$gene_name %&% ' - END')
   print(i/nrow(gene_df) * 100)
