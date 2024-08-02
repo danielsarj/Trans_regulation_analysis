@@ -32,12 +32,22 @@ for (f in folders_vector){
 }
 ## use map_df to extract data from 
 ## multiple files in parallel 
-em_pvals <- map_df(files_to_read, read_the_file)
+em_pvals <- map_df(files_to_read, read_the_file) 
 em_pvals$LOG10P <- 10^-(em_pvals$LOG10P)
 
 # merge dfs
 merge <- inner_join(em_pvals, sumstats, by=c('GENE'='gene_name')) %>%
   select(GENE, LOG10P, pval) %>% rename(core_gene=GENE, em_pval=LOG10P, mo_pval=pval)
+
+# substitute 0s to avoid error in DACT
+em_zeros <- which(merge$em_pval==0) %>% as.vector()
+for (i in em_zeros){
+  merge[i]$em_pval <- 1e-200
+}
+mo_zeros <- which(merge$mo_zeros==0) %>% as.vector()
+for (i in mo_zeros){
+  merge[i]$mo_zeros <- 1e-200
+}
 
 # run DACT
 merge <- merge %>% 
