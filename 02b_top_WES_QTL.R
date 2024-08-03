@@ -13,12 +13,17 @@ gene_df <- fread('example/gene_position.txt') %>%
 # read WES GWAS sumstats
 sumstats <- fread('/project/xuanyao/daniel/UKB/LDL_GCST90083019_buildGRCh38.tsv.gz')
 
+# for every gene
 for (i in 1:nrow(gene_df)){
   start_time <- Sys.time()
   working_gene <- gene_df[i,]
   print(working_gene$gene_name %&% ' - START')
+  
+  # keep the sumstats of the M3.1 class burden alleles 
   qtls <- sumstats %>% filter(str_detect(Name, working_gene$gene_name),
                               effect_allele=='M3.1') 
+  
+  # confirm gene is in the sumstats 
   if (nrow(qtls)>0){
     gene_df$topeQTL[i] <- qtls$effect_allele
     gene_df$pval[i] <- qtls$p_value
@@ -32,5 +37,8 @@ for (i in 1:nrow(gene_df)){
   print(end_time - start_time)
 }
 
+# remove genes without sumstats
 gene_df <- gene_df %>% filter(topeQTL!='A')
+
+# save
 fwrite(gene_df, 'genes_WES_topeQTL.txt', quote=F, sep=' ')
