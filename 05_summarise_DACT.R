@@ -4,7 +4,7 @@ library(purrr)
 read_the_file <- function(x){
   gene_name <- substr(x, 5, nchar(x)-4)
   d <- fread(x)
-  d <- d %>% filter(DACT_pval<(0.05/(length(dact_genes)*2942))) %>% mutate(peri_gene=gene_name)
+  d <- d %>% filter(p.adjust(DACT_pval, method='fdr')<=0.01) %>% mutate(peri_gene=gene_name)
   return(d)
 }
 setwd('/project/xuanyao/daniel/DACT_analysis/DACT_results/')
@@ -23,8 +23,6 @@ sig_dact <- sig_dact %>% select(peri_gene, core_gene,
 
 # print some stuff
 print(length(dact_genes))
-print(length(dact_genes)*2942)
-print(0.05/(length(dact_genes)*2942))
 
 # save results
 fwrite(sig_dact, '../DACT_sig_results.txt', quote=F, sep=' ')
