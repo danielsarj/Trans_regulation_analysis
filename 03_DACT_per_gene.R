@@ -19,7 +19,13 @@ args <- parser$parse_args()
 sumstats <- fread('genes_WES_topeQTL.txt')
 
 # get gene info 
-wk_gene <- fread('genes_w_topeQTL.txt') %>% filter(gene_name==args$g)
+wk_gene <- fread('genes_w_topeQTL.txt') %>% filter(gene_name==g)
+
+# find and remove cis-genes from the WES sumstats
+cis_genes <- sumstats %>% filter(chr==wk_gene$chr, 
+                                 start >= wk_gene$start-1e6 & end <= wk_gene$end+1e6) %>%
+  select(gene_name) %>% pull()
+sumstats <- sumstats %>% filter(gene_name%in%cis_genes==F) 
 
 # get exposure-mediator pvals
 ## create a list of file names 
