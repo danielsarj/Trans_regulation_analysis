@@ -19,7 +19,7 @@ args <- parser$parse_args()
 sumstats <- fread('genes_WES_topeQTL.txt')
 
 # get gene info 
-wk_gene <- fread('genes_w_topeQTL.txt') %>% filter(gene_name==g)
+wk_gene <- fread('genes_w_topeQTL.txt') %>% filter(gene_name==args$g)
 
 # find and remove cis-genes from the WES sumstats
 cis_genes <- sumstats %>% filter(chr==wk_gene$chr, 
